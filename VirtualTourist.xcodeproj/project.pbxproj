@@ -9,23 +9,33 @@
 /* Begin PBXBuildFile section */
 		0850B7F625FBB0F800423E99 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B7F525FBB0F800423E99 /* AppDelegate.swift */; };
 		0850B7F825FBB0F800423E99 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B7F725FBB0F800423E99 /* SceneDelegate.swift */; };
-		0850B7FA25FBB0F800423E99 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B7F925FBB0F800423E99 /* ViewController.swift */; };
+		0850B7FA25FBB0F800423E99 /* MapVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B7F925FBB0F800423E99 /* MapVC.swift */; };
 		0850B7FD25FBB0F800423E99 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0850B7FB25FBB0F800423E99 /* Main.storyboard */; };
 		0850B80025FBB0F800423E99 /* VirtualTourist.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 0850B7FE25FBB0F800423E99 /* VirtualTourist.xcdatamodeld */; };
 		0850B80225FBB0FA00423E99 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0850B80125FBB0FA00423E99 /* Assets.xcassets */; };
 		0850B80525FBB0FA00423E99 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0850B80325FBB0FA00423E99 /* LaunchScreen.storyboard */; };
+		0850B81425FBB77A00423E99 /* AlbumVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B81325FBB77A00423E99 /* AlbumVC.swift */; };
+		0850B81725FBB7A800423E99 /* NetworkClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B81625FBB7A800423E99 /* NetworkClient.swift */; };
+		0850B81B25FBB83800423E99 /* CustomButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B81A25FBB83800423E99 /* CustomButton.swift */; };
+		0850B81F25FBB87D00423E99 /* ColorPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B81E25FBB87D00423E99 /* ColorPalette.swift */; };
+		0850B82225FBBA4600423E99 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B82125FBBA4600423E99 /* DataController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0850B7F225FBB0F800423E99 /* VirtualTourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VirtualTourist.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0850B7F525FBB0F800423E99 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0850B7F725FBB0F800423E99 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		0850B7F925FBB0F800423E99 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		0850B7F925FBB0F800423E99 /* MapVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapVC.swift; sourceTree = "<group>"; };
 		0850B7FC25FBB0F800423E99 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		0850B7FF25FBB0F800423E99 /* VirtualTourist.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = VirtualTourist.xcdatamodel; sourceTree = "<group>"; };
 		0850B80125FBB0FA00423E99 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0850B80425FBB0FA00423E99 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0850B80625FBB0FA00423E99 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0850B81325FBB77A00423E99 /* AlbumVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumVC.swift; sourceTree = "<group>"; };
+		0850B81625FBB7A800423E99 /* NetworkClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkClient.swift; sourceTree = "<group>"; };
+		0850B81A25FBB83800423E99 /* CustomButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomButton.swift; sourceTree = "<group>"; };
+		0850B81E25FBB87D00423E99 /* ColorPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPalette.swift; sourceTree = "<group>"; };
+		0850B82125FBBA4600423E99 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,13 +68,13 @@
 		0850B7F425FBB0F800423E99 /* VirtualTourist */ = {
 			isa = PBXGroup;
 			children = (
+				0850B81D25FBB86900423E99 /* Constants */,
 				0850B81025FBB1B300423E99 /* Delegate */,
-				0850B80F25FBB17200423E99 /* View */,
 				0850B80D25FBB13100423E99 /* Model */,
+				0850B80F25FBB17200423E99 /* View */,
 				0850B80E25FBB16A00423E99 /* Controller */,
-				0850B7FB25FBB0F800423E99 /* Main.storyboard */,
-				0850B80125FBB0FA00423E99 /* Assets.xcassets */,
-				0850B80325FBB0FA00423E99 /* LaunchScreen.storyboard */,
+				0850B82525FBBAB400423E99 /* Assets */,
+				0850B82425FBBA9300423E99 /* StoryBoard */,
 				0850B80625FBB0FA00423E99 /* Info.plist */,
 			);
 			path = VirtualTourist;
@@ -73,7 +83,9 @@
 		0850B80D25FBB13100423E99 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				0850B81925FBB7B200423E99 /* Networking */,
 				0850B7FE25FBB0F800423E99 /* VirtualTourist.xcdatamodeld */,
+				0850B82125FBBA4600423E99 /* DataController.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -81,7 +93,8 @@
 		0850B80E25FBB16A00423E99 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				0850B7F925FBB0F800423E99 /* ViewController.swift */,
+				0850B7F925FBB0F800423E99 /* MapVC.swift */,
+				0850B81325FBB77A00423E99 /* AlbumVC.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -89,6 +102,7 @@
 		0850B80F25FBB17200423E99 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				0850B81A25FBB83800423E99 /* CustomButton.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -100,6 +114,39 @@
 				0850B7F725FBB0F800423E99 /* SceneDelegate.swift */,
 			);
 			path = Delegate;
+			sourceTree = "<group>";
+		};
+		0850B81925FBB7B200423E99 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				0850B81625FBB7A800423E99 /* NetworkClient.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		0850B81D25FBB86900423E99 /* Constants */ = {
+			isa = PBXGroup;
+			children = (
+				0850B81E25FBB87D00423E99 /* ColorPalette.swift */,
+			);
+			path = Constants;
+			sourceTree = "<group>";
+		};
+		0850B82425FBBA9300423E99 /* StoryBoard */ = {
+			isa = PBXGroup;
+			children = (
+				0850B7FB25FBB0F800423E99 /* Main.storyboard */,
+				0850B80325FBB0FA00423E99 /* LaunchScreen.storyboard */,
+			);
+			path = StoryBoard;
+			sourceTree = "<group>";
+		};
+		0850B82525FBBAB400423E99 /* Assets */ = {
+			isa = PBXGroup;
+			children = (
+				0850B80125FBB0FA00423E99 /* Assets.xcassets */,
+			);
+			path = Assets;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -173,9 +220,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				0850B80025FBB0F800423E99 /* VirtualTourist.xcdatamodeld in Sources */,
-				0850B7FA25FBB0F800423E99 /* ViewController.swift in Sources */,
+				0850B81425FBB77A00423E99 /* AlbumVC.swift in Sources */,
+				0850B7FA25FBB0F800423E99 /* MapVC.swift in Sources */,
+				0850B81F25FBB87D00423E99 /* ColorPalette.swift in Sources */,
+				0850B82225FBBA4600423E99 /* DataController.swift in Sources */,
 				0850B7F625FBB0F800423E99 /* AppDelegate.swift in Sources */,
+				0850B81B25FBB83800423E99 /* CustomButton.swift in Sources */,
 				0850B7F825FBB0F800423E99 /* SceneDelegate.swift in Sources */,
+				0850B81725FBB7A800423E99 /* NetworkClient.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
