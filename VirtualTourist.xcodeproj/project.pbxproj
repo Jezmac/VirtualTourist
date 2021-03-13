@@ -19,6 +19,7 @@
 		0850B81B25FBB83800423E99 /* CustomButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B81A25FBB83800423E99 /* CustomButton.swift */; };
 		0850B81F25FBB87D00423E99 /* ColorPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B81E25FBB87D00423E99 /* ColorPalette.swift */; };
 		0850B82225FBBA4600423E99 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B82125FBBA4600423E99 /* DataController.swift */; };
+		0850B82D25FD022F00423E99 /* MKCoordinateRegion+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B82C25FD022F00423E99 /* MKCoordinateRegion+Extension.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +37,7 @@
 		0850B81A25FBB83800423E99 /* CustomButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomButton.swift; sourceTree = "<group>"; };
 		0850B81E25FBB87D00423E99 /* ColorPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPalette.swift; sourceTree = "<group>"; };
 		0850B82125FBBA4600423E99 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
+		0850B82C25FD022F00423E99 /* MKCoordinateRegion+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MKCoordinateRegion+Extension.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +71,7 @@
 			isa = PBXGroup;
 			children = (
 				0850B81D25FBB86900423E99 /* Constants */,
+				0850B82B25FD020300423E99 /* Extension */,
 				0850B81025FBB1B300423E99 /* Delegate */,
 				0850B80D25FBB13100423E99 /* Model */,
 				0850B80F25FBB17200423E99 /* View */,
@@ -147,6 +150,14 @@
 				0850B80125FBB0FA00423E99 /* Assets.xcassets */,
 			);
 			path = Assets;
+			sourceTree = "<group>";
+		};
+		0850B82B25FD020300423E99 /* Extension */ = {
+			isa = PBXGroup;
+			children = (
+				0850B82C25FD022F00423E99 /* MKCoordinateRegion+Extension.swift */,
+			);
+			path = Extension;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -228,6 +239,7 @@
 				0850B81B25FBB83800423E99 /* CustomButton.swift in Sources */,
 				0850B7F825FBB0F800423E99 /* SceneDelegate.swift in Sources */,
 				0850B81725FBB7A800423E99 /* NetworkClient.swift in Sources */,
+				0850B82D25FD022F00423E99 /* MKCoordinateRegion+Extension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
