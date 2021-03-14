@@ -15,10 +15,15 @@ class MapVC: UIViewController, MKMapViewDelegate {
     
     @IBOutlet weak var mapView: MKMapView!
     
+    
+    //MARK:- LifeCycle
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        mapView.delegate = self
     }
+    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -27,10 +32,107 @@ class MapVC: UIViewController, MKMapViewDelegate {
         } else {
             print("First time loading app")
         }
+        addGestureRecognizer()
+    }
+    
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        mapView.region.save(to: UserDefaults.standard, with: regionKey)
     }
     
     deinit {
         mapView.region.save(to: UserDefaults.standard, with: regionKey)
     }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if (segue.identifier == "pinTapped") {
+            let albumVC = segue.destination as! AlbumVC
+            let annotation = sender as! AnnotationUnpersistent
+            albumVC.annotation = annotation
+            
+        }
+    }
+    
+    //MARK:- MapView Delegate functions
+    
+    // On selecting a pin the data is passed to the AlbumVC which is then called. The pin must be deselected or it will be unresponsive on returning to the MapVC.
+    func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+        if let coordinate = view.annotation?.coordinate {
+        let annotation = AnnotationUnpersistent(
+            title: (view.annotation?.title ?? "No Location") ?? "",
+            latitude: coordinate.latitude,
+            longitude: coordinate.longitude
+            )
+            mapView.deselectAnnotation(view.annotation, animated: false)
+        self.performSegue(withIdentifier: "pinTapped", sender: annotation)
+        }
+    }
+    
+    // Controls the appearance and behaviour of annotation objects
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        let reuseId = "pin"
+        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
+        if pinView == nil {
+            pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+            pinView!.canShowCallout = true
+            pinView!.pinTintColor = .red
+            pinView!.animatesDrop = true
+        } else {
+            pinView!.annotation = annotation
+        }
+        return pinView
+    }
+    
+    
+    //MARK:- Actions
+    
+    @objc func longTap(sender: UILongPressGestureRecognizer) {
+        if sender.state == .began {
+            let pointInView = sender.location(in: mapView)
+            let pointOnMap = mapView.convert(pointInView, toCoordinateFrom: mapView)
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = pointOnMap
+            let location = CLLocation(latitude: pointOnMap.latitude, longitude: pointOnMap.longitude)
+            getPlaceMark(location: location) { result in
+                switch result {
+                case .failure:
+                    Alert.showGeocodeFailure(on: self)
+                case .success(let placemark):
+                    annotation.title = placemark.locality
+                    self.mapView.addAnnotation(annotation)
+                }
+            }
+        }
+    }
+    
+    func getPlaceMark(location: CLLocation, completion: @escaping (Result<CLPlacemark, ErrorType>) -> Void) {
+
+            CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
+                if error != nil {
+                    DispatchQueue.main.async {
+                        completion(.failure(.geocode))
+                    }
+                }
+                var location: CLPlacemark?
+                // Selects first result from geocode if there are more than one.
+                if let placemarks = placemarks, placemarks.count > 0 {
+                    location = placemarks.first
+                }
+                if let location = location {
+                    DispatchQueue.main.async {
+                        completion(.success(location))
+                }
+            }
+        }
+    }
 }
 
+
+extension MapVC {
+    
+    func addGestureRecognizer() {
+        let longTapGesture = UILongPressGestureRecognizer(target: self, action: #selector(longTap))
+        self.view.addGestureRecognizer(longTapGesture)
+    }
+}

@@ -20,6 +20,9 @@
 		0850B81F25FBB87D00423E99 /* ColorPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B81E25FBB87D00423E99 /* ColorPalette.swift */; };
 		0850B82225FBBA4600423E99 /* DataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B82125FBBA4600423E99 /* DataController.swift */; };
 		0850B82D25FD022F00423E99 /* MKCoordinateRegion+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B82C25FD022F00423E99 /* MKCoordinateRegion+Extension.swift */; };
+		0850B83125FD584100423E99 /* Alert.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B83025FD584100423E99 /* Alert.swift */; };
+		0850B83525FD5AA400423E99 /* ErrorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B83425FD5AA400423E99 /* ErrorType.swift */; };
+		0850B83825FEB0E400423E99 /* AnnotationUnpersistent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B83725FEB0E400423E99 /* AnnotationUnpersistent.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +41,9 @@
 		0850B81E25FBB87D00423E99 /* ColorPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPalette.swift; sourceTree = "<group>"; };
 		0850B82125FBBA4600423E99 /* DataController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataController.swift; sourceTree = "<group>"; };
 		0850B82C25FD022F00423E99 /* MKCoordinateRegion+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MKCoordinateRegion+Extension.swift"; sourceTree = "<group>"; };
+		0850B83025FD584100423E99 /* Alert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Alert.swift; sourceTree = "<group>"; };
+		0850B83425FD5AA400423E99 /* ErrorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorType.swift; sourceTree = "<group>"; };
+		0850B83725FEB0E400423E99 /* AnnotationUnpersistent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationUnpersistent.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -70,6 +76,7 @@
 		0850B7F425FBB0F800423E99 /* VirtualTourist */ = {
 			isa = PBXGroup;
 			children = (
+				0850B82F25FD57F800423E99 /* Alert */,
 				0850B81D25FBB86900423E99 /* Constants */,
 				0850B82B25FD020300423E99 /* Extension */,
 				0850B81025FBB1B300423E99 /* Delegate */,
@@ -123,6 +130,7 @@
 			isa = PBXGroup;
 			children = (
 				0850B81625FBB7A800423E99 /* NetworkClient.swift */,
+				0850B83725FEB0E400423E99 /* AnnotationUnpersistent.swift */,
 			);
 			path = Networking;
 			sourceTree = "<group>";
@@ -158,6 +166,15 @@
 				0850B82C25FD022F00423E99 /* MKCoordinateRegion+Extension.swift */,
 			);
 			path = Extension;
+			sourceTree = "<group>";
+		};
+		0850B82F25FD57F800423E99 /* Alert */ = {
+			isa = PBXGroup;
+			children = (
+				0850B83025FD584100423E99 /* Alert.swift */,
+				0850B83425FD5AA400423E99 /* ErrorType.swift */,
+			);
+			path = Alert;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -238,7 +255,10 @@
 				0850B7F625FBB0F800423E99 /* AppDelegate.swift in Sources */,
 				0850B81B25FBB83800423E99 /* CustomButton.swift in Sources */,
 				0850B7F825FBB0F800423E99 /* SceneDelegate.swift in Sources */,
+				0850B83825FEB0E400423E99 /* AnnotationUnpersistent.swift in Sources */,
+				0850B83125FD584100423E99 /* Alert.swift in Sources */,
 				0850B81725FBB7A800423E99 /* NetworkClient.swift in Sources */,
+				0850B83525FD5AA400423E99 /* ErrorType.swift in Sources */,
 				0850B82D25FD022F00423E99 /* MKCoordinateRegion+Extension.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
