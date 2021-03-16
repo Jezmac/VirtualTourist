@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 class NetworkClient {
     
@@ -21,19 +22,18 @@ class NetworkClient {
         
         
         case getPhotos([Double])
-        case getImageForPhoto(String)
+        case getImageForPhoto(PhotoStruct)
         
         var stringValue: String {
             switch self {
-            case .getPhotos(let coordinate): return "\(Endpoints.base)?method=flickr.photos.search&api_key=\(Endpoints.key)&geo_context=2&lat=\(coordinate[0])&geo_context=2&lat=\(coordinate[1])&format=json&nojsoncallback=1"
-            case .getImageForPhoto(let id): return Endpoints.base + id
+            case .getPhotos(let coordinate): return "\(Endpoints.base)?method=flickr.photos.search&api_key=\(Endpoints.key)&geo_context=2&lat=\(coordinate[0])&geo_context=2&lat=\(coordinate[1])&per_page=30&format=json&nojsoncallback=1"
+            case .getImageForPhoto(let photo): return "https://farm\(photo.farm).staticflickr.com/\(photo.server)/\(photo.id)_\(photo.secret)_m.jpg"
             }
         }
         
         var url: URL {
             return URL(string: stringValue)!
         }
-        //    let url = "https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key=911bebfe2a9beb397796a7fb3f02febd&geo_context=2&lat=1.0&geo_context=2&lat=1.0&format=rest"
     }
     
     class func taskForGETRequest<ResponseType: Decodable>(url: URL, response: ResponseType.Type, completion: @escaping (Result<ResponseType, ErrorType>) -> Void) {
@@ -71,8 +71,37 @@ class NetworkClient {
                 completion(.failure(error))
             case .success(let response):
                 completion(.success(response))
+                print(response.photos.photo.count)
+                for photo in response.photos.photo {
+                    getImageForPhotoRequest(photo: photo) { result in
+                        
+                        // Create completion handler that saves images to persistent store
+                        switch result {
+                        case .failure(let error):
+                            print(error.localizedDescription)
+                        case .success(let image):
+                            print(image)
+                        }
+                    }
+                }
                 print(response.stat)
             }
         }
+    }
+    
+    class func getImageForPhotoRequest(photo: PhotoStruct, completion: @escaping (Result<UIImage, ErrorType>) -> Void) {
+        URLSession.shared.dataTask(with: Endpoints.getImageForPhoto(photo).url) { data, response, error in
+            guard let data = data else {
+                DispatchQueue.main.async {
+                    completion(.failure(.image))
+                }
+                return
+            }
+            if let image = UIImage(data: data) {
+                DispatchQueue.main.async {
+                    completion(.success(image))
+                }
+            }
+        }.resume()
     }
 }

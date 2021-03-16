@@ -25,7 +25,6 @@ class AlbumVC: UIViewController {
         let coordinate = [annotation.latitude, annotation.longitude]
         let clCoordinate = CLLocationCoordinate2D(latitude: coordinate[0], longitude: coordinate[1])
         NetworkClient.getPhotosRequest(coordinate: coordinate, completion: handleGetPhotosRequest(result:))
-        
         let newPin = MKPointAnnotation()
         newPin.coordinate = clCoordinate
         mapView.addAnnotation(newPin)

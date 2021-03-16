@@ -26,7 +26,7 @@
 		0850B83525FD5AA400423E99 /* ErrorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B83425FD5AA400423E99 /* ErrorType.swift */; };
 		0850B83825FEB0E400423E99 /* AnnotationUnpersistent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B83725FEB0E400423E99 /* AnnotationUnpersistent.swift */; };
 		0850B83C25FFAB1800423E99 /* Photos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B83B25FFAB1800423E99 /* Photos.swift */; };
-		0850B83F25FFAC6A00423E99 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B83E25FFAC6A00423E99 /* Photo.swift */; };
+		0850B83F25FFAC6A00423E99 /* PhotoStruct.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B83E25FFAC6A00423E99 /* PhotoStruct.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,7 +51,7 @@
 		0850B83425FD5AA400423E99 /* ErrorType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorType.swift; sourceTree = "<group>"; };
 		0850B83725FEB0E400423E99 /* AnnotationUnpersistent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnnotationUnpersistent.swift; sourceTree = "<group>"; };
 		0850B83B25FFAB1800423E99 /* Photos.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photos.swift; sourceTree = "<group>"; };
-		0850B83E25FFAC6A00423E99 /* Photo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
+		0850B83E25FFAC6A00423E99 /* PhotoStruct.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoStruct.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -192,7 +192,7 @@
 			children = (
 				082C5D832600BC190068C207 /* PhotosResponse.swift */,
 				0850B83B25FFAB1800423E99 /* Photos.swift */,
-				0850B83E25FFAC6A00423E99 /* Photo.swift */,
+				0850B83E25FFAC6A00423E99 /* PhotoStruct.swift */,
 			);
 			path = Response;
 			sourceTree = "<group>";
@@ -277,7 +277,7 @@
 				0850B81B25FBB83800423E99 /* CustomButton.swift in Sources */,
 				0850B7F825FBB0F800423E99 /* SceneDelegate.swift in Sources */,
 				082C5D882600C3DC0068C207 /* Cell.swift in Sources */,
-				0850B83F25FFAC6A00423E99 /* Photo.swift in Sources */,
+				0850B83F25FFAC6A00423E99 /* PhotoStruct.swift in Sources */,
 				0850B83825FEB0E400423E99 /* AnnotationUnpersistent.swift in Sources */,
 				082C5D842600BC190068C207 /* PhotosResponse.swift in Sources */,
 				0850B83125FD584100423E99 /* Alert.swift in Sources */,

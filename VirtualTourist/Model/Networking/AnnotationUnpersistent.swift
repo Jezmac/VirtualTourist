@@ -12,5 +12,6 @@ struct AnnotationUnpersistent {
     let title: String
     let latitude: Double
     let longitude: Double
+    var album: Photos?
 
 }

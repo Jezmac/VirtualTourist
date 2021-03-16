@@ -11,4 +11,5 @@ enum ErrorType: Error {
     case geocode
     case connection
     case decoding
+    case image
 }
