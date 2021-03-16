@@ -21,4 +21,8 @@ struct Alert {
     static func showGeocodeFailure(on vc: UIViewController) {
         showBasicAlert(on: vc, with: "Could not find location", message: "Debugging Alert")
     }
+    
+    static func showGetPhotosFailure(on vc: UIViewController) {
+        showBasicAlert(on: vc, with: "Could not get photos for this location", message: "Download Failure")
+    }
 }
