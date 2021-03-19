@@ -9,18 +9,22 @@ import UIKit
 import MapKit
 import CoreData
 
-class MapVC: UIViewController, MKMapViewDelegate {
+class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
     
     
     private let regionKey = "region"
-    
-    var pins: [Pin] = []
     
     var annotations: [MKPointAnnotation]!
     
     var dataController: DataController!
     
     var fetchedResultsController: NSFetchedResultsController<Pin>!
+    
+    var newPin: Pin!
+    
+    var pins: [Pin] = []
+    
+    var pinObserverToken: Any!
     
     @IBOutlet weak var mapView: MKMapView!
     
@@ -34,47 +38,30 @@ class MapVC: UIViewController, MKMapViewDelegate {
     }
     
     
-
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-//        setUpFetchedResultsController()
+        navigationController?.isNavigationBarHidden = true
         loadStoredRegion()
         addGestureRecognizer()
-        
-        let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
-        if let result = try? dataController.backgroundContext.fetch(fetchRequest) {
-            pins = result
-            var annotations = [MKPointAnnotation()]
-            for pin in pins {
-                let annotation = MKPointAnnotation()
-                annotation.title = pin.title
-                annotation.coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
-                annotations.append(annotation)
-            }
-            DispatchQueue.main.async {
-                self.mapView.addAnnotations(annotations)
-            }
-        }
-
+//        addPinObserverNotification()
+        setUpFetchedResultsController()
+        loadAnnotations()
     }
     
     
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        mapView.region.save(to: UserDefaults.standard, with: regionKey)
-    }
-    
-    deinit {
+        fetchedResultsController = nil
+//        removePinObserverNotification()
         mapView.region.save(to: UserDefaults.standard, with: regionKey)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if (segue.identifier == "pinTapped") {
             let albumVC = segue.destination as! AlbumVC
-            let annotation = sender as! AnnotationUnpersistent
-            albumVC.annotation = annotation
-            
+            let pin = sender as! Pin
+            albumVC.pin = pin
+            albumVC.dataController = self.dataController
         }
     }
     
@@ -86,32 +73,50 @@ class MapVC: UIViewController, MKMapViewDelegate {
         }
     }
     
-//    func setUpFetchedResultsController() {
-//        let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
-//        let sortDescriptor = NSSortDescriptor(key: "title", ascending: false)
-//        fetchRequest.sortDescriptors = [sortDescriptor]
-//
-//        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "pins")
-//        fetchedResultsController.delegate = self
-//        do {
-//            try fetchedResultsController.performFetch()
-//        } catch {
-//            fatalError("The fetch could not be performed: \(error.localizedDescription)")
-//        }
-//    }
+    func setUpFetchedResultsController() {
+        let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
+        let sortDescriptor = NSSortDescriptor(key: "latitude", ascending: false)
+        fetchRequest.sortDescriptors = [sortDescriptor]
+        
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+        fetchedResultsController.delegate = self
+        do {
+            try fetchedResultsController.performFetch()
+        } catch {
+            fatalError("The fetch could not be performed: \(error.localizedDescription)")
+        }
+    }
+    
+    func loadAnnotations() {
+        mapView.removeAnnotations(mapView.annotations)
+        if let pins = fetchedResultsController.fetchedObjects {
+            for pin in pins {
+                DispatchQueue.main.async {
+                    self.mapView.addAnnotation(pin.annotation())
+                }
+            }
+        }
+    }
     
     //MARK:- MapView Delegate functions
     
     // On selecting a pin the data is passed to the AlbumVC which is then called. The pin must be deselected or it will be unresponsive on returning to the MapVC.
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         if let coordinate = view.annotation?.coordinate {
-            let annotation = AnnotationUnpersistent(
-                title: (view.annotation?.title ?? "No Location") ?? "",
-                latitude: coordinate.latitude,
-                longitude: coordinate.longitude
-            )
-            mapView.deselectAnnotation(view.annotation, animated: false)
-            self.performSegue(withIdentifier: "pinTapped", sender: annotation)
+            do {
+                try fetchedResultsController.performFetch()
+            } catch {
+                fatalError("The fetch could not be performed: \(error.localizedDescription)")
+            }
+            if let pins = fetchedResultsController.fetchedObjects {
+                for pin in pins {
+                    if pin.latitude == coordinate.latitude && pin.longitude == coordinate.longitude {
+                        let selectedPin = pin
+                        mapView.deselectAnnotation(view.annotation, animated: false)
+                        self.performSegue(withIdentifier: "pinTapped", sender: selectedPin)
+                    }
+                }
+            }
         }
     }
     
@@ -138,24 +143,51 @@ class MapVC: UIViewController, MKMapViewDelegate {
             // convert point of touch to coordinate in mapview
             let pointInView = sender.location(in: mapView)
             let pointOnMap = mapView.convert(pointInView, toCoordinateFrom: mapView)
-            // create annotation for instant pindrop
-            let annotation = MKPointAnnotation()
-            annotation.coordinate = pointOnMap
-            // Use coordinate to create location object for geocoding
-            let location = CLLocation(latitude: pointOnMap.latitude, longitude: pointOnMap.longitude)
-            // Fix unresponsive map glitch using imperceptible map interaction
             mapView.setCenter(mapView.centerCoordinate, animated: false)
-            // call  reverse geocode to obtain locality information
-            getPlaceMark(location: location) { result in
-                switch result {
-                case .failure:
-                    Alert.showGeocodeFailure(on: self)
-                case .success(let placemark):
-                    self.mapView.addAnnotation(annotation)
-                    annotation.title = placemark.locality
-                    self.addPin(title: placemark.locality ?? "", location: location)
-                }
-            }
+            addPin(coordinate: pointOnMap)
+        }
+    }
+    
+//    // Using notifications userKey and casting it to a pin object we are able to get the properties of the newly created pin and generate an annotation for it.
+//    @objc func pinAdded(_ notification: Notification) {
+//        guard let inserted = notification.insertedObjects as? Set<Pin> else { return }
+//        dataController.viewContext.perform {
+//            for pin in inserted {
+//////              self.newPin = pin
+//////              self.mapView.addAnnotation(pin.annotation())
+////                let coordinate = [pin.latitude, pin.longitude]
+//            }
+//        }
+//    }
+    
+    
+    
+    func handleGetPhotosRequest(result: Result<PhotosResponse, Error>) {
+        switch result {
+        case .failure:
+            Alert.showGetPhotosFailure(on: self)
+        case .success(let response):
+            NetworkClient.getImageForPhotoRequest(response: response, completion: handleImageForPhotoResponse(result:))
+            
+        // addpin() here pass in necessary stuff for photorequest
+        }
+    }
+    
+    func addPhotos(_ data: (Data)) {
+        let viewContext = dataController.viewContext
+        let photo = Photo(context: viewContext)
+        photo.image = data
+        photo.creationDate = Date()
+        photo.pin = newPin
+        try? viewContext.save()
+    }
+    
+    func handleImageForPhotoResponse(result: Result<Data, Error>) {
+        switch result {
+        case .failure(let error):
+            print(error.localizedDescription)
+        case .success(let data):
+            addPhotos(data)
         }
     }
     
@@ -181,19 +213,22 @@ class MapVC: UIViewController, MKMapViewDelegate {
     }
     
     // Saves pin to persistent store
-    func addPin(title: String, location: CLLocation) {
+    func addPin(coordinate: CLLocationCoordinate2D) {
+        let coordinateDouble = [coordinate.latitude, coordinate.longitude]
+        NetworkClient.getPhotosRequest(coordinate: coordinateDouble, completion: self.handleGetPhotosRequest(result:))
         let viewContext = dataController.viewContext
         viewContext.perform {
-            let coordinate: [Double] = [location.coordinate.latitude, location.coordinate.longitude]
             let pin = Pin(context: viewContext)
-            pin.title = title
-            pin.latitude = coordinate[0]
-            pin.longitude = coordinate[1]
+            pin.latitude = coordinate.latitude
+            pin.longitude = coordinate.longitude
             try? viewContext.save()
+            self.newPin = pin
+            self.mapView.addAnnotation(pin.annotation())
         }
     }
 }
 
+//MARK:- Notifications and gesture recognizers
 
 extension MapVC {
     
@@ -201,15 +236,14 @@ extension MapVC {
         let longTapGesture = UILongPressGestureRecognizer(target: self, action: #selector(longTap))
         self.view.addGestureRecognizer(longTapGesture)
     }
-}
-
-extension MapVC: NSFetchedResultsControllerDelegate {
     
-    func controllerWillChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-    }
-    
-    
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-    }
+//    func addPinObserverNotification() {
+//        let pinAddedNotification = NSManagedObjectContext.didSaveObjectsNotification
+//        NotificationCenter.default.addObserver(self, selector: #selector(pinAdded(_:)), name: pinAddedNotification, object: nil)
+//    }
+//
+//    func removePinObserverNotification() {
+//        NotificationCenter.default.removeObserver(self)
+//    }
 }
 

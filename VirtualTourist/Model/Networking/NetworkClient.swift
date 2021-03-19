@@ -26,7 +26,7 @@ class NetworkClient {
         
         var stringValue: String {
             switch self {
-            case .getPhotos(let coordinate): return "\(Endpoints.base)?method=flickr.photos.search&api_key=\(Endpoints.key)&geo_context=2&lat=\(coordinate[0])&geo_context=2&lat=\(coordinate[1])&per_page=30&format=json&nojsoncallback=1"
+            case .getPhotos(let coordinate): return "\(Endpoints.base)?method=flickr.photos.search&api_key=\(Endpoints.key)&geo_context=2&lat=\(coordinate[0])&lat=\(coordinate[1])&radius=0.1&per_page=30&format=json&nojsoncallback=1"
             case .getImageForPhoto(let photo): return "https://farm\(photo.farm).staticflickr.com/\(photo.server)/\(photo.id)_\(photo.secret)_m.jpg"
             }
         }
@@ -43,7 +43,7 @@ class NetworkClient {
         URLSession.shared.dataTask(with: request) { data, response, error  in
             guard let data = data else {
                 DispatchQueue.main.async {
-                completion(.failure(.connection))
+                    completion(.failure(.connection))
                     print("ConnectionFailure")
                 }
                 return
@@ -71,37 +71,26 @@ class NetworkClient {
                 completion(.failure(error))
             case .success(let response):
                 completion(.success(response))
-                print(response.photos.photo.count)
-                for photo in response.photos.photo {
-                    getImageForPhotoRequest(photo: photo) { result in
-                        
-                        // Create completion handler that saves images to persistent store
-                        switch result {
-                        case .failure(let error):
-                            print(error.localizedDescription)
-                        case .success(let image):
-                            print(image)
-                        }
-                    }
-                }
                 print(response.stat)
             }
         }
     }
     
-    class func getImageForPhotoRequest(photo: PhotoStruct, completion: @escaping (Result<UIImage, ErrorType>) -> Void) {
-        URLSession.shared.dataTask(with: Endpoints.getImageForPhoto(photo).url) { data, response, error in
-            guard let data = data else {
-                DispatchQueue.main.async {
-                    completion(.failure(.image))
+    class func getImageForPhotoRequest(response: PhotosResponse, completion: @escaping (Result<Data, Error>) -> Void) {
+        for photo in response.photos.photo {
+            URLSession.shared.dataTask(with: Endpoints.getImageForPhoto(photo).url) { data, response, error in
+                if let error = error {
+                    DispatchQueue.main.async {
+                        completion(.failure(error))
+                    }
+                    return
                 }
-                return
-            }
-            if let image = UIImage(data: data) {
-                DispatchQueue.main.async {
-                    completion(.success(image))
+                if let data = data {
+                    DispatchQueue.main.async {
+                        completion(.success(data))
+                    }
                 }
-            }
-        }.resume()
+            }.resume()
+        }
     }
 }

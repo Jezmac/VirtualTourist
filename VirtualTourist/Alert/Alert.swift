@@ -25,4 +25,8 @@ struct Alert {
     static func showGetPhotosFailure(on vc: UIViewController) {
         showBasicAlert(on: vc, with: "Could not get photos for this location", message: "Download Failure")
     }
+    
+    static func showGetImagesFailure(on vc: UIViewController) {
+        showBasicAlert(on: vc, with: "Could not get download any images for this location", message: "Download Failure")
+    }
 }
