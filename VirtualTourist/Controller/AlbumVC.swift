@@ -21,7 +21,9 @@ class AlbumVC: UIViewController {
     var fetchedResultsController: NSFetchedResultsController<Photo>!
     
     var pin: Pin!
-
+    
+    
+    var diffableDataSource: UICollectionViewDiffableDataSource<String, NSManagedObjectID>!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,7 +31,7 @@ class AlbumVC: UIViewController {
         navigationItem.backBarButtonItem?.title = "Back"
         mapManager(mapView: zoomMapView)
         imageCollection.contentMode = .scaleAspectFill
-        
+        setupCollectionViewDataSource()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -44,11 +46,11 @@ class AlbumVC: UIViewController {
     }
     
     
-    fileprivate func setUpFetchedResultsController() {
+    private func setUpFetchedResultsController() {
         let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
         let predicate = NSPredicate(format: "pin == %@", pin)
         fetchRequest.predicate = predicate
-        let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: false)
+        let sortDescriptor = NSSortDescriptor(key: "creationDate", ascending: true)
         fetchRequest.sortDescriptors = [sortDescriptor]
         
         fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
@@ -60,19 +62,42 @@ class AlbumVC: UIViewController {
         }
     }
     
+    private func setupCollectionViewDataSource() {
+        diffableDataSource = UICollectionViewDiffableDataSource<String, NSManagedObjectID>(collectionView: imageCollection) { (collectionView, indexPath, objectID) -> UICollectionViewCell? in
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! Cell
+            let aPhoto = self.fetchedResultsController.object(at: indexPath)
+            if let data = aPhoto.image {
+                cell.imageView.image = UIImage(data: data)
+            } else {
+                cell.activityIndicator.startAnimating()
+            }
+            return cell
+        }
+    }
+    
     
     func mapManager(mapView: MKMapView) {
         let annotation = pin.annotation()
         mapView.addAnnotation(annotation)
         mapView.setCenter(annotation.coordinate, animated: true)
-        let region = MKCoordinateRegion(center: annotation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5))
+        let region = MKCoordinateRegion(center: annotation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
         mapView.setRegion(region, animated: true)
         mapView.selectAnnotation(annotation, animated: true)
+    }
+    
+    func deletePhoto(at indexPath: IndexPath) {
+        let viewContext = dataController.viewContext
+        viewContext.performAndWait {
+            let photoToDelete = self.fetchedResultsController.object(at: indexPath)
+            print(photoToDelete)
+            viewContext.delete(photoToDelete)
+            try? viewContext.save()
+        }
     }
 }
     
 
-extension AlbumVC: UICollectionViewDataSource, UICollectionViewDelegate, NSFetchedResultsControllerDelegate, UICollectionViewDelegateFlowLayout {
+extension AlbumVC: UICollectionViewDelegate, NSFetchedResultsControllerDelegate, UICollectionViewDelegateFlowLayout {
     
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -97,12 +122,11 @@ extension AlbumVC: UICollectionViewDataSource, UICollectionViewDelegate, NSFetch
         return fetchedResultsController.sections?[section].numberOfObjects ?? 0
     }
     
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let aPhoto = fetchedResultsController.object(at: indexPath)
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! Cell
-        if let data = aPhoto.image {
-            cell.imageView.image = UIImage(data: data)
-        }
-        return cell
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        deletePhoto(at: indexPath)
+    }
+    
+    func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith snapshot: NSDiffableDataSourceSnapshotReference) {
+        self.diffableDataSource.apply(snapshot as NSDiffableDataSourceSnapshot<String, NSManagedObjectID>, animatingDifferences: true)
     }
 }

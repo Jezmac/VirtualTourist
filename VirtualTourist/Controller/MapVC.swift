@@ -22,8 +22,6 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
     
     var newPin: Pin!
     
-    var pins: [Pin] = []
-    
     var pinObserverToken: Any!
     
     @IBOutlet weak var mapView: MKMapView!
@@ -73,12 +71,13 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
         }
     }
     
+
     func setUpFetchedResultsController() {
         let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
         let sortDescriptor = NSSortDescriptor(key: "latitude", ascending: false)
         fetchRequest.sortDescriptors = [sortDescriptor]
-        
-        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: nil)
+//        NSFetchedResultsController<Pin>.deleteCache(withName: "pins")
+        fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "pins")
         fetchedResultsController.delegate = self
         do {
             try fetchedResultsController.performFetch()

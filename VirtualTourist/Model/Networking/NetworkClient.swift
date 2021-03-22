@@ -26,7 +26,7 @@ class NetworkClient {
         
         var stringValue: String {
             switch self {
-            case .getPhotos(let coordinate): return "\(Endpoints.base)?method=flickr.photos.search&api_key=\(Endpoints.key)&geo_context=2&lat=\(coordinate[0])&lat=\(coordinate[1])&radius=0.1&per_page=30&format=json&nojsoncallback=1"
+            case .getPhotos(let coordinate): return "\(Endpoints.base)?method=flickr.photos.search&api_key=\(Endpoints.key)&geo_context=2&lat=\(coordinate[0])&lat=\(coordinate[1])&radius=0.1&per_page=30&format=json&nojsoncallback=1&bbox=\(coordinate[1]-0.1),\(coordinate[0]-0.1),\(coordinate[1]+0.1),\(coordinate[0]+0.1)"
             case .getImageForPhoto(let photo): return "https://farm\(photo.farm).staticflickr.com/\(photo.server)/\(photo.id)_\(photo.secret)_m.jpg"
             }
         }
