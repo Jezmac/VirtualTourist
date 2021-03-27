@@ -94,6 +94,17 @@ class AlbumVC: UIViewController {
             try? viewContext.save()
         }
     }
+    @IBAction func newCollectionTapped(_ sender: Any) {
+        if let photos = fetchedResultsController.fetchedObjects {
+            let viewContext = dataController.viewContext
+            for photo in photos.reversed() {
+                viewContext.perform {
+                    viewContext.delete(photo)
+                }
+                try? viewContext.save()
+            }
+        }
+    }
 }
     
 

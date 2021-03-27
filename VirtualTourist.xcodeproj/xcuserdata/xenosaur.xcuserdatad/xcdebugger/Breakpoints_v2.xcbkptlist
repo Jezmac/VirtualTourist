@@ -14,10 +14,10 @@
             filePath = "VirtualTourist/Controller/AlbumVC.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "121"
-            endingLineNumber = "121"
-            landmarkName = "collectionView(_:numberOfItemsInSection:)"
-            landmarkType = "7">
+            startingLineNumber = "143"
+            endingLineNumber = "143"
+            landmarkName = "AlbumVC"
+            landmarkType = "21">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -131,16 +131,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "2626AD2E-327D-4E2D-92A7-079DE2D8CBC6"
+            uuid = "41DDD40A-832A-40CE-BCF6-1B0CDA45362C"
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "VirtualTourist/Controller/AlbumVC.swift"
+            filePath = "VirtualTourist/Controller/MapVC.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "51"
-            endingLineNumber = "51"
-            landmarkName = "setUpFetchedResultsController()"
+            startingLineNumber = "224"
+            endingLineNumber = "224"
+            landmarkName = "addPin(coordinate:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

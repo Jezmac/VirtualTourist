@@ -95,6 +95,17 @@
                                     <outlet property="delegate" destination="Ifh-6o-7XX" id="6YR-Ft-GsE"/>
                                 </connections>
                             </collectionView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RE8-SU-Ds2" customClass="CustomButton" customModule="VirtualTourist" customModuleProvider="target">
+                                <rect key="frame" x="20" y="798" width="374" height="44"/>
+                                <color key="backgroundColor" red="0.057406917209999998" green="0.62772893910000005" blue="0.8039464355" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="26"/>
+                                <state key="normal" title="New Collection">
+                                    <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </state>
+                                <connections>
+                                    <action selector="newCollectionTapped:" destination="Ifh-6o-7XX" eventType="touchUpInside" id="hEm-ds-M6O"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="doH-aZ-S8c"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -104,10 +115,13 @@
                             <constraint firstItem="Ano-bE-16D" firstAttribute="top" secondItem="QTE-CQ-zee" secondAttribute="bottom" constant="-3" id="FF7-oe-MqP"/>
                             <constraint firstItem="Ano-bE-16D" firstAttribute="leading" secondItem="doH-aZ-S8c" secondAttribute="leading" id="GGK-0Q-1vD"/>
                             <constraint firstItem="QTE-CQ-zee" firstAttribute="trailing" secondItem="ryK-Yh-YTp" secondAttribute="trailing" id="Ios-Lq-DfN"/>
+                            <constraint firstItem="doH-aZ-S8c" firstAttribute="bottom" secondItem="RE8-SU-Ds2" secondAttribute="bottom" constant="20" id="LHA-EN-QV3"/>
                             <constraint firstItem="Ano-bE-16D" firstAttribute="trailing" secondItem="doH-aZ-S8c" secondAttribute="trailing" id="PMM-AP-JB5"/>
+                            <constraint firstItem="RE8-SU-Ds2" firstAttribute="leading" secondItem="ryK-Yh-YTp" secondAttribute="leadingMargin" id="XPv-G5-ybl"/>
                             <constraint firstItem="QTE-CQ-zee" firstAttribute="leading" secondItem="ryK-Yh-YTp" secondAttribute="leading" id="aNb-sI-CCu"/>
                             <constraint firstItem="Ano-bE-16D" firstAttribute="bottom" secondItem="doH-aZ-S8c" secondAttribute="bottom" id="gZn-nz-H1e"/>
                             <constraint firstItem="Ano-bE-16D" firstAttribute="top" secondItem="QTE-CQ-zee" secondAttribute="bottom" constant="-3" id="hMu-KP-x8T"/>
+                            <constraint firstItem="RE8-SU-Ds2" firstAttribute="centerX" secondItem="Ano-bE-16D" secondAttribute="centerX" id="tFf-hY-qgG"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="BPi-D3-mEw"/>
