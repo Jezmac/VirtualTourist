@@ -14,15 +14,12 @@ class AlbumVC: UIViewController {
     
     @IBOutlet weak var zoomMapView: MKMapView!
     @IBOutlet weak var imageCollection: UICollectionView!
+    @IBOutlet weak var newCollectionButton: CustomButton!
     
     
     var dataController: DataController!
-    
     var fetchedResultsController: NSFetchedResultsController<Photo>!
-    
     var pin: Pin!
-    
-    
     var diffableDataSource: UICollectionViewDiffableDataSource<String, NSManagedObjectID>!
     
     override func viewDidLoad() {
@@ -67,6 +64,13 @@ class AlbumVC: UIViewController {
         diffableDataSource = UICollectionViewDiffableDataSource<String, NSManagedObjectID>(collectionView: imageCollection) { (collectionView, indexPath, objectID) -> UICollectionViewCell? in
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! Cell
             let aPhoto = self.fetchedResultsController.object(at: indexPath)
+            
+            if aPhoto.image == nil {
+                self.newCollectionButton.isEnabled = false
+                cell.imageView.backgroundColor = ColorPalette.udacityBlue.withAlphaComponent(0.5)
+                cell.activityIndicator.startAnimating()
+                
+            }
             if let data = aPhoto.image {
                 cell.imageView.image = UIImage(data: data)
             } else {
@@ -74,6 +78,49 @@ class AlbumVC: UIViewController {
             }
             return cell
         }
+    }
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        //print("this is called")
+//        let photoCell = collectionView.dequeueReusableCell(withReuseIdentifier: "CustomPhotoAlbum", for: indexPath) as! PhotoAlbumCustomCell
+        
+        guard !(self.fetchedResultsController.fetchedObjects?.isEmpty)! else {
+            print("images are already present.")
+            return photoCell
+        }
+        
+        let photo = self.fetchedResultsController.object(at: indexPath)
+        
+        if photo.imageData == nil {
+            newCollectionButton.isEnabled = false // User cannot interact with it when downloading images
+            photoCell.imageOverlay.backgroundColor = UIColor.customColor(red: 242, green: 242, blue: 254, alpha: 0.85)
+            photoCell.imageLoadingIndicator.startAnimating()
+            DispatchQueue.global(qos: .background).async {
+                if let imageData = try? Data(contentsOf: photo.imageURL!) {
+                    DispatchQueue.main.async {
+                        photo.imageData = imageData
+                        do {
+                            try self.photoAlbumDataController.viewContext.save()
+                        } catch {
+                            print("error in saving image data")
+                        }
+                        let image = UIImage(data: imageData)
+                        print("index is : \(indexPath.row)")
+                        photoCell.selectedLatLongImage.image = image
+                        photoCell.imageOverlay.backgroundColor = UIColor.customColor(red: 255, green: 255, blue: 255, alpha: 0)
+                        photoCell.imageLoadingIndicator.stopAnimating()
+                    }
+                }
+            }
+        } else {
+            if let imageData = photo.imageData {
+                let image = UIImage(data: imageData)
+                photoCell.selectedLatLongImage.image =  image
+                photoCell.imageOverlay.backgroundColor = UIColor.customColor(red: 255, green: 255, blue: 255, alpha: 0)
+                photoCell.imageLoadingIndicator.stopAnimating()
+            }
+        }
+        newCollectionButton.isEnabled = true
+        return photoCell
     }
     
     
@@ -104,9 +151,10 @@ class AlbumVC: UIViewController {
                 }
                 try? viewContext.save()
             }
-            let randomPage = Int(arc4random_uniform(UInt32(pin.totalPages)) + 1)
+            let page = min(pin.totalPages, 4000/30)
+            let randomPage = Int(arc4random_uniform(UInt32(page)) + 1)
             print("page: \(randomPage)")
-            NetworkClient.getPhotosRequest(coordinate: pin.coordinate(), page: randomPage, completion: self.handleGetPhotosRequest(result:))
+            NetworkClient.getPhotosRequest(coordinate: pin.coordinate(), pageNo: randomPage, completion: self.handleGetPhotosRequest(result:))
         }
     }
     

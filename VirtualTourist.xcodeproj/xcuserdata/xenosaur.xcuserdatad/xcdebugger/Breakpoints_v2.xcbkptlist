@@ -14,10 +14,10 @@
             filePath = "VirtualTourist/Controller/AlbumVC.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "175"
-            endingLineNumber = "175"
-            landmarkName = "unknown"
-            landmarkType = "0">
+            startingLineNumber = "223"
+            endingLineNumber = "223"
+            landmarkName = "AlbumVC"
+            landmarkType = "21">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -30,8 +30,8 @@
             filePath = "VirtualTourist/Controller/AlbumVC.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "23"
-            endingLineNumber = "23"
+            startingLineNumber = "22"
+            endingLineNumber = "22"
             landmarkName = "AlbumVC"
             landmarkType = "3">
             <Locations>
@@ -138,8 +138,8 @@
             filePath = "VirtualTourist/Controller/MapVC.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "228"
-            endingLineNumber = "228"
+            startingLineNumber = "190"
+            endingLineNumber = "190"
             landmarkName = "addPin(coordinate:totalPages:)"
             landmarkType = "7">
          </BreakpointContent>

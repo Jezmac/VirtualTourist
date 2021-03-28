@@ -11,20 +11,18 @@ import CoreData
 
 class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
     
-    
+    //MARK:- Global Variables
     private let regionKey = "region"
-    
     var annotations: [MKPointAnnotation]!
-    
     var dataController: DataController!
-    
     var fetchedResultsController: NSFetchedResultsController<Pin>!
-    
     var newPin: Pin!
     var selectedCoordinate: CLLocationCoordinate2D!
 
     
     var pinObserverToken: Any!
+    
+    //MARK:- Outlets
     
     @IBOutlet weak var mapView: MKMapView!
     
@@ -37,13 +35,11 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
         mapView.delegate = self
     }
     
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.isNavigationBarHidden = true
         loadStoredRegion()
         addGestureRecognizer()
-//        addPinObserverNotification()
         setUpFetchedResultsController()
         loadAnnotations()
     }
@@ -52,7 +48,6 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         fetchedResultsController = nil
-//        removePinObserverNotification()
         mapView.region.save(to: UserDefaults.standard, with: regionKey)
     }
     
@@ -78,7 +73,6 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
         let fetchRequest: NSFetchRequest<Pin> = Pin.fetchRequest()
         let sortDescriptor = NSSortDescriptor(key: "latitude", ascending: false)
         fetchRequest.sortDescriptors = [sortDescriptor]
-//        NSFetchedResultsController<Pin>.deleteCache(withName: "pins")
         fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: dataController.viewContext, sectionNameKeyPath: nil, cacheName: "pins")
         fetchedResultsController.delegate = self
         do {
@@ -141,28 +135,16 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
     
     @objc func longTap(sender: UILongPressGestureRecognizer) {
         if sender.state == .began {
+            
             // convert point of touch to coordinate in mapview
             let pointInView = sender.location(in: mapView)
             let pointOnMap = mapView.convert(pointInView, toCoordinateFrom: mapView)
             selectedCoordinate = pointOnMap
             mapView.setCenter(mapView.centerCoordinate, animated: false)
             let coordinateDouble = [pointOnMap.latitude, pointOnMap.longitude]
-            NetworkClient.getPhotosRequest(coordinate: coordinateDouble, page: 1, completion: self.handleGetPhotosRequest(result:))
+            NetworkClient.getPhotosRequest(coordinate: coordinateDouble, pageNo: 1, completion: self.handleGetPhotosRequest(result:))
         }
     }
-    
-//    // Using notifications userKey and casting it to a pin object we are able to get the properties of the newly created pin and generate an annotation for it.
-//    @objc func pinAdded(_ notification: Notification) {
-//        guard let inserted = notification.insertedObjects as? Set<Pin> else { return }
-//        dataController.viewContext.perform {
-//            for pin in inserted {
-//////              self.newPin = pin
-//////              self.mapView.addAnnotation(pin.annotation())
-////                let coordinate = [pin.latitude, pin.longitude]
-//            }
-//        }
-//    }
-    
     
     
     func handleGetPhotosRequest(result: Result<PhotosResponse, Error>) {
@@ -194,27 +176,7 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
             addPhotos(data)
         }
     }
-    
-    func getPlaceMark(location: CLLocation, completion: @escaping (Result<CLPlacemark, ErrorType>) -> Void) {
-        
-        CLGeocoder().reverseGeocodeLocation(location) { placemarks, error in
-            if error != nil {
-                DispatchQueue.main.async {
-                    completion(.failure(.geocode))
-                }
-            }
-            var placemark: CLPlacemark?
-            // Selects first result from geocode if there are more than one.
-            if let placemarks = placemarks, placemarks.count > 0 {
-                placemark = placemarks.first
-            }
-            if let placemark = placemark {
-                DispatchQueue.main.async {
-                    completion(.success(placemark))
-                }
-            }
-        }
-    }
+
     
     // Saves pin to persistent store
     func addPin(coordinate: CLLocationCoordinate2D, totalPages: Int) {
@@ -239,14 +201,5 @@ extension MapVC {
         let longTapGesture = UILongPressGestureRecognizer(target: self, action: #selector(longTap))
         self.view.addGestureRecognizer(longTapGesture)
     }
-    
-//    func addPinObserverNotification() {
-//        let pinAddedNotification = NSManagedObjectContext.didSaveObjectsNotification
-//        NotificationCenter.default.addObserver(self, selector: #selector(pinAdded(_:)), name: pinAddedNotification, object: nil)
-//    }
-//
-//    func removePinObserverNotification() {
-//        NotificationCenter.default.removeObserver(self)
-//    }
 }
 

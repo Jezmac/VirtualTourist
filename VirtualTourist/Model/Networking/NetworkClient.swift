@@ -12,7 +12,8 @@ class NetworkClient {
     
     let secret = "b661c8eea9ef884f"
     
-    // This is the url with geo context as limiting factor. adds latitude and longitude queries.
+    
+    // Generates URLs for the 2 main requests.  Using a coordinate array to get the photoResponse and passing in a photo struct when the call to getImageForPhoto is made.
     
     enum Endpoints {
         
@@ -34,6 +35,8 @@ class NetworkClient {
             return URL(string: stringValue)!
         }
     }
+    
+    // This is the generic get request function
     
     class func taskForGETRequest<ResponseType: Decodable>(url: URL, response: ResponseType.Type, completion: @escaping (Result<ResponseType, ErrorType>) -> Void) {
         var request = URLRequest(url: url)
@@ -62,13 +65,18 @@ class NetworkClient {
         }.resume()
     }
     
-    
-    class func getPhotosRequest(coordinate: [Double], page: Int, completion: @escaping (Result<PhotosResponse, Error>) -> Void) {
+    // This gets a photoResponse from the Flickr API based on a coordinate pair. This is either the point selected on the map or it comes from a pin object in the AlbumVC.
+    class func getPhotosRequest(coordinate: [Double], pageNo: Int, completion: @escaping (Result<PhotosResponse, Error>) -> Void) {
+        
+        // Use basic URL if no pageNo is provided
         var url = Endpoints.getPhotos(coordinate).url
-        if page > 1 {
-            url.append
+        
+        // add page parameter if a random value has been given (from newCollectionTapped)
+        if pageNo > 1 {
+            url = url.appendQuery("page", value: "\(pageNo)")
+            print(url)
         }
-        taskForGETRequest(url: Endpoints.getPhotos(coordinate).url, response: PhotosResponse.self) { result in
+        taskForGETRequest(url: url, response: PhotosResponse.self) { result in
             print(url)
             switch result {
             case .failure(let error):
@@ -80,7 +88,26 @@ class NetworkClient {
         }
     }
     
+    // This function gets the photo data for each photo object in a photoResponse. It is called automatically every time a call to flickr is made.
     class func getImageForPhotoRequest(response: PhotosResponse, completion: @escaping (Result<Data, Error>) -> Void) {
+        for photo in response.photos.photo {
+            URLSession.shared.dataTask(with: Endpoints.getImageForPhoto(photo).url) { data, response, error in
+                if let error = error {
+                    DispatchQueue.main.async {
+                        completion(.failure(error))
+                    }
+                    return
+                }
+                if let data = data {
+                    DispatchQueue.main.async {
+                        completion(.success(data))
+                    }
+                }
+            }.resume()
+        }
+    }
+    
+    class func makeImageURLForPhotoResponse(response: PhotosResponse, completion: @escaping (Result<Data, Error>) -> Void) {
         for photo in response.photos.photo {
             URLSession.shared.dataTask(with: Endpoints.getImageForPhoto(photo).url) { data, response, error in
                 if let error = error {

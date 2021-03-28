@@ -96,9 +96,9 @@
                                 </connections>
                             </collectionView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RE8-SU-Ds2" customClass="CustomButton" customModule="VirtualTourist" customModuleProvider="target">
-                                <rect key="frame" x="20" y="798" width="374" height="44"/>
+                                <rect key="frame" x="20" y="803" width="374" height="39"/>
                                 <color key="backgroundColor" red="0.057406917209999998" green="0.62772893910000005" blue="0.8039464355" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="26"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="22"/>
                                 <state key="normal" title="New Collection">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 </state>
@@ -127,6 +127,7 @@
                     <navigationItem key="navigationItem" id="BPi-D3-mEw"/>
                     <connections>
                         <outlet property="imageCollection" destination="Ano-bE-16D" id="yD0-Sv-bEt"/>
+                        <outlet property="newCollectionButton" destination="RE8-SU-Ds2" id="pqT-5m-6dR"/>
                         <outlet property="zoomMapView" destination="QTE-CQ-zee" id="QiV-ey-9qB"/>
                     </connections>
                 </viewController>

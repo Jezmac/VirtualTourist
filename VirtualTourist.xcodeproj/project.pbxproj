@@ -10,6 +10,7 @@
 		082C5D842600BC190068C207 /* PhotosResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 082C5D832600BC190068C207 /* PhotosResponse.swift */; };
 		082C5D882600C3DC0068C207 /* Cell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 082C5D872600C3DC0068C207 /* Cell.swift */; };
 		082C5D9126028F480068C207 /* Pin+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 082C5D9026028F480068C207 /* Pin+Extension.swift */; };
+		08495E3E2610D16100DF7248 /* URL+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08495E3D2610D16100DF7248 /* URL+Extension.swift */; };
 		0850B7F625FBB0F800423E99 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B7F525FBB0F800423E99 /* AppDelegate.swift */; };
 		0850B7F825FBB0F800423E99 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B7F725FBB0F800423E99 /* SceneDelegate.swift */; };
 		0850B7FA25FBB0F800423E99 /* MapVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0850B7F925FBB0F800423E99 /* MapVC.swift */; };
@@ -36,6 +37,7 @@
 		082C5D832600BC190068C207 /* PhotosResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotosResponse.swift; sourceTree = "<group>"; };
 		082C5D872600C3DC0068C207 /* Cell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cell.swift; sourceTree = "<group>"; };
 		082C5D9026028F480068C207 /* Pin+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Pin+Extension.swift"; sourceTree = "<group>"; };
+		08495E3D2610D16100DF7248 /* URL+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Extension.swift"; sourceTree = "<group>"; };
 		0850B7F225FBB0F800423E99 /* VirtualTourist.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = VirtualTourist.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0850B7F525FBB0F800423E99 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0850B7F725FBB0F800423E99 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -191,6 +193,7 @@
 				0850B82C25FD022F00423E99 /* MKCoordinateRegion+Extension.swift */,
 				08525E1E26039D8C00BEB1E8 /* Dictionary+Extension.swift */,
 				08525E2126039E3E00BEB1E8 /* Notification+Extension.swift */,
+				08495E3D2610D16100DF7248 /* URL+Extension.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -289,6 +292,7 @@
 				0850B80025FBB0F800423E99 /* VirtualTourist.xcdatamodeld in Sources */,
 				0850B81425FBB77A00423E99 /* AlbumVC.swift in Sources */,
 				0850B7FA25FBB0F800423E99 /* MapVC.swift in Sources */,
+				08495E3E2610D16100DF7248 /* URL+Extension.swift in Sources */,
 				0850B81F25FBB87D00423E99 /* ColorPalette.swift in Sources */,
 				0850B82225FBBA4600423E99 /* DataController.swift in Sources */,
 				0850B7F625FBB0F800423E99 /* AppDelegate.swift in Sources */,
