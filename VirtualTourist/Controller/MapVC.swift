@@ -17,7 +17,6 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
     var dataController: DataController!
     var fetchedResultsController: NSFetchedResultsController<Pin>!
     var newPin: Pin!
-    var selectedCoordinate: CLLocationCoordinate2D!
 
     
     var pinObserverToken: Any!
@@ -50,17 +49,10 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
         fetchedResultsController = nil
         mapView.region.save(to: UserDefaults.standard, with: regionKey)
     }
+
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if (segue.identifier == "pinTapped") {
-            let albumVC = segue.destination as! AlbumVC
-            let pin = sender as! Pin
-            albumVC.pin = pin
-            albumVC.dataController = self.dataController
-        }
-    }
     
-    fileprivate func loadStoredRegion() {
+    private func loadStoredRegion() {
         if let region = mapView.region.load(from: UserDefaults.standard, with: regionKey) {
             mapView.region = region
         } else {
@@ -82,6 +74,7 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
         }
     }
     
+    
     func loadAnnotations() {
         mapView.removeAnnotations(mapView.annotations)
         if let pins = fetchedResultsController.fetchedObjects {
@@ -93,23 +86,37 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
         }
     }
     
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if (segue.identifier == "pinTapped") {
+            let albumVC = segue.destination as! AlbumVC
+            let pin = sender as! Pin
+            albumVC.pin = pin
+            albumVC.dataController = self.dataController
+        }
+    }
+    
+    
     //MARK:- MapView Delegate functions
     
     // On selecting a pin the data is passed to the AlbumVC which is then called. The pin must be deselected or it will be unresponsive on returning to the MapVC.
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+        mapView.deselectAnnotation(view.annotation, animated: false)
         if let coordinate = view.annotation?.coordinate {
             do {
                 try fetchedResultsController.performFetch()
             } catch {
                 fatalError("The fetch could not be performed: \(error.localizedDescription)")
             }
-            if let pins = fetchedResultsController.fetchedObjects {
-                for pin in pins {
-                    if pin.latitude == coordinate.latitude && pin.longitude == coordinate.longitude {
-                        let selectedPin = pin
-                        mapView.deselectAnnotation(view.annotation, animated: false)
-                        self.performSegue(withIdentifier: "pinTapped", sender: selectedPin)
-                    }
+            testForMatchingPin(coordinate)
+        }
+    }
+    
+    fileprivate func testForMatchingPin(_ coordinate: CLLocationCoordinate2D) {
+        if let pins = fetchedResultsController.fetchedObjects {
+            for pin in pins {
+                if pin.latitude == coordinate.latitude && pin.longitude == coordinate.longitude {
+                    self.performSegue(withIdentifier: "pinTapped", sender: pin)
                 }
             }
         }
@@ -131,7 +138,7 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
     }
     
     
-    //MARK:- Actions
+    //MARK:- Actions and related functions
     
     @objc func longTap(sender: UILongPressGestureRecognizer) {
         if sender.state == .began {
@@ -139,56 +146,25 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
             // convert point of touch to coordinate in mapview
             let pointInView = sender.location(in: mapView)
             let pointOnMap = mapView.convert(pointInView, toCoordinateFrom: mapView)
-            selectedCoordinate = pointOnMap
+            addPin(coordinate: pointOnMap)
             mapView.setCenter(mapView.centerCoordinate, animated: false)
-            let coordinateDouble = [pointOnMap.latitude, pointOnMap.longitude]
-            NetworkClient.getPhotosRequest(coordinate: coordinateDouble, pageNo: 1, completion: self.handleGetPhotosRequest(result:))
-        }
-    }
-    
-    
-    func handleGetPhotosRequest(result: Result<PhotosResponse, Error>) {
-        switch result {
-        case .failure:
-            Alert.showGetPhotosFailure(on: self)
-        case .success(let response):
-            print(response.photos.pages)
-            addPin(coordinate: selectedCoordinate, totalPages: response.photos.pages)
-            NetworkClient.getImageForPhotoRequest(response: response, completion: handleImageForPhotoResponse(result:))
-            
-        }
-    }
-    
-    func addPhotos(_ data: (Data)) {
-        let viewContext = dataController.viewContext
-        let photo = Photo(context: viewContext)
-        photo.image = data
-        photo.creationDate = Date()
-        photo.pin = newPin
-        try? viewContext.save()
-    }
-    
-    func handleImageForPhotoResponse(result: Result<Data, Error>) {
-        switch result {
-        case .failure(let error):
-            print(error.localizedDescription)
-        case .success(let data):
-            addPhotos(data)
         }
     }
 
     
-    // Saves pin to persistent store
-    func addPin(coordinate: CLLocationCoordinate2D, totalPages: Int) {
+    // Saves pin to persistent store. totalPages is set to 1 until the Flickr response provides the necessary data. The call to Flickr is made as sson as the pin is created.
+    func addPin(coordinate: CLLocationCoordinate2D) {
         let viewContext = dataController.viewContext
         viewContext.perform {
             let pin = Pin(context: viewContext)
             pin.latitude = coordinate.latitude
             pin.longitude = coordinate.longitude
-            pin.totalPages = Int32(totalPages)
+            pin.totalPages = 1
             try? viewContext.save()
             self.newPin = pin
             self.mapView.addAnnotation(pin.annotation())
+            NetworkClient.getPhotosRequest(pin: pin, pageNo: 1, dataController: self.dataController) { result in
+            }
         }
     }
 }

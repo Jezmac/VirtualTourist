@@ -18,7 +18,6 @@ class DataController {
     
     init(modelName: String) {
         persistentContainer = NSPersistentContainer(name: modelName)
-        
     }
     
     func configureContexts() {

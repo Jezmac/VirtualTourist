@@ -9,7 +9,7 @@ import UIKit
 import MapKit
 import CoreData
 
-class AlbumVC: UIViewController {
+class AlbumVC: UIViewController, MKMapViewDelegate {
 
     
     @IBOutlet weak var zoomMapView: MKMapView!
@@ -22,8 +22,10 @@ class AlbumVC: UIViewController {
     var pin: Pin!
     var diffableDataSource: UICollectionViewDiffableDataSource<String, NSManagedObjectID>!
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        zoomMapView.delegate = self
         navigationController?.isNavigationBarHidden = false
         navigationItem.backBarButtonItem?.title = "Back"
         mapManager(mapView: zoomMapView)
@@ -31,11 +33,12 @@ class AlbumVC: UIViewController {
         setupCollectionViewDataSource()
     }
     
+
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         setUpFetchedResultsController()
-        imageCollection.reloadData()
-        print(pin.totalPages)
+        setupNewCollectionButton()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -60,67 +63,58 @@ class AlbumVC: UIViewController {
         }
     }
     
+    fileprivate func setupNewCollectionButton() {
+        print(pin.totalPages)
+        if pin.totalPages == 1 {
+            newCollectionButton.isEnabled(false)
+            newCollectionButton.setTitle("All Images Loaded For Location", for: .normal)
+        }
+        else if fetchedResultsController.fetchedObjects == [] {
+            newCollectionButton.isEnabled(false)
+            newCollectionButton.setTitle("No Images For Location", for: .normal)
+        } else {
+            newCollectionButton.setTitle("New Collection", for: .normal)
+        }
+    }
+    
+    // Diffable datasource is the new delegate protocol for automatically animating changes in a collection view when its datasource changes.
     private func setupCollectionViewDataSource() {
         diffableDataSource = UICollectionViewDiffableDataSource<String, NSManagedObjectID>(collectionView: imageCollection) { (collectionView, indexPath, objectID) -> UICollectionViewCell? in
+            
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! Cell
+            
             let aPhoto = self.fetchedResultsController.object(at: indexPath)
             
+            
             if aPhoto.image == nil {
-                self.newCollectionButton.isEnabled = false
+                self.newCollectionButton.isEnabled(false)
                 cell.imageView.backgroundColor = ColorPalette.udacityBlue.withAlphaComponent(0.5)
                 cell.activityIndicator.startAnimating()
                 
-            }
-            if let data = aPhoto.image {
-                cell.imageView.image = UIImage(data: data)
+                DispatchQueue.global(qos: .background).async {
+                    if let imageData = try? Data(contentsOf: aPhoto.imageURL!) {
+                        DispatchQueue.main.async {
+                            let viewContext = self.dataController.viewContext
+                            aPhoto.image = imageData
+                            try? viewContext.save()
+                            cell.imageView.backgroundColor = .white
+                            cell.imageView.image = UIImage(data: imageData)
+                            cell.activityIndicator.stopAnimating()
+                        }
+                    }
+                }
             } else {
-                cell.activityIndicator.startAnimating()
+                if let imageData = aPhoto.image {
+                    cell.imageView.backgroundColor = .white
+                    cell.imageView.image = UIImage(data: imageData)
+                    cell.activityIndicator.stopAnimating()
+                }
+                if self.newCollectionButton.currentTitle == "New Collection" {
+                    self.newCollectionButton.isEnabled(true)
+                }
             }
             return cell
         }
-    }
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        //print("this is called")
-//        let photoCell = collectionView.dequeueReusableCell(withReuseIdentifier: "CustomPhotoAlbum", for: indexPath) as! PhotoAlbumCustomCell
-        
-        guard !(self.fetchedResultsController.fetchedObjects?.isEmpty)! else {
-            print("images are already present.")
-            return photoCell
-        }
-        
-        let photo = self.fetchedResultsController.object(at: indexPath)
-        
-        if photo.imageData == nil {
-            newCollectionButton.isEnabled = false // User cannot interact with it when downloading images
-            photoCell.imageOverlay.backgroundColor = UIColor.customColor(red: 242, green: 242, blue: 254, alpha: 0.85)
-            photoCell.imageLoadingIndicator.startAnimating()
-            DispatchQueue.global(qos: .background).async {
-                if let imageData = try? Data(contentsOf: photo.imageURL!) {
-                    DispatchQueue.main.async {
-                        photo.imageData = imageData
-                        do {
-                            try self.photoAlbumDataController.viewContext.save()
-                        } catch {
-                            print("error in saving image data")
-                        }
-                        let image = UIImage(data: imageData)
-                        print("index is : \(indexPath.row)")
-                        photoCell.selectedLatLongImage.image = image
-                        photoCell.imageOverlay.backgroundColor = UIColor.customColor(red: 255, green: 255, blue: 255, alpha: 0)
-                        photoCell.imageLoadingIndicator.stopAnimating()
-                    }
-                }
-            }
-        } else {
-            if let imageData = photo.imageData {
-                let image = UIImage(data: imageData)
-                photoCell.selectedLatLongImage.image =  image
-                photoCell.imageOverlay.backgroundColor = UIColor.customColor(red: 255, green: 255, blue: 255, alpha: 0)
-                photoCell.imageLoadingIndicator.stopAnimating()
-            }
-        }
-        newCollectionButton.isEnabled = true
-        return photoCell
     }
     
     
@@ -131,7 +125,23 @@ class AlbumVC: UIViewController {
         let region = MKCoordinateRegion(center: annotation.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01))
         mapView.setRegion(region, animated: true)
         mapView.selectAnnotation(annotation, animated: true)
+        mapView.isUserInteractionEnabled = false
     }
+    
+    // Controls the appearance and behaviour of annotation objects
+    func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        let reuseId = "pin"
+        var pinView = mapView.dequeueReusableAnnotationView(withIdentifier: reuseId) as? MKPinAnnotationView
+        if pinView == nil {
+            pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
+            pinView!.pinTintColor = .red
+            pinView!.animatesDrop = true
+        } else {
+            pinView!.annotation = annotation
+        }
+        return pinView
+    }
+    
     
     func deletePhoto(at indexPath: IndexPath) {
         let viewContext = dataController.viewContext
@@ -154,36 +164,10 @@ class AlbumVC: UIViewController {
             let page = min(pin.totalPages, 4000/30)
             let randomPage = Int(arc4random_uniform(UInt32(page)) + 1)
             print("page: \(randomPage)")
-            NetworkClient.getPhotosRequest(coordinate: pin.coordinate(), pageNo: randomPage, completion: self.handleGetPhotosRequest(result:))
+            NetworkClient.getPhotosRequest(pin: pin, pageNo: randomPage, dataController: dataController) { result in
+                
+            }
         }
-    }
-    
-    func handleGetPhotosRequest(result: Result<PhotosResponse, Error>) {
-        switch result {
-        case .failure:
-            Alert.showGetPhotosFailure(on: self)
-        case .success(let response):
-            NetworkClient.getImageForPhotoRequest(response: response, completion: self.handleImageForPhotoResponse(result:))
-            
-        }
-    }
-    
-    func handleImageForPhotoResponse(result: Result<Data, Error>) {
-        switch result {
-        case .failure(let error):
-            print(error.localizedDescription)
-        case .success(let data):
-            addPhotos(data)
-        }
-    }
-    
-    func addPhotos(_ data: (Data)) {
-        let viewContext = dataController.viewContext
-        let photo = Photo(context: viewContext)
-        photo.image = data
-        photo.creationDate = Date()
-        photo.pin = pin
-        try? viewContext.save()
     }
 }
     

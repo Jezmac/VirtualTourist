@@ -3,7 +3,9 @@
 //  VirtualTourist
 //
 //  Created by Jeremy MacLeod on 28/03/2021.
-//
+//  This extension is based on an implementation by Bhuvan Bhatt on Jun 22 '18 at 14:43
+// it can be found at: https://stackoverflow.com/questions/34060754/how-can-i-build-a-url-with-query-parameters-containing-multiple-values-for-the-s
+
 
 import Foundation
 

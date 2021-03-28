@@ -21,12 +21,12 @@ class NetworkClient {
         static let key = "911bebfe2a9beb397796a7fb3f02febd"
         
         
-        case getPhotos([Double])
+        case getPhotos(Pin)
         case getImageForPhoto(PhotoStruct)
         
         var stringValue: String {
             switch self {
-            case .getPhotos(let coordinate): return "\(Endpoints.base)?method=flickr.photos.search&api_key=\(Endpoints.key)&geo_context=2&lat=\(coordinate[0])&lon=\(coordinate[1])&radius=0.1&per_page=30&format=json&nojsoncallback=1&bbox=\(coordinate[1]-0.1),\(coordinate[0]-0.1),\(coordinate[1]+0.1),\(coordinate[0]+0.1)"
+            case .getPhotos(let pin): return "\(Endpoints.base)?method=flickr.photos.search&api_key=\(Endpoints.key)&geo_context=2&lat=\(pin.coordinate()[0])&lon=\(pin.coordinate()[1])&radius=0.1&per_page=30&format=json&nojsoncallback=1&bbox=\(pin.coordinate()[1]-0.1),\(pin.coordinate()[0]-0.1),\(pin.coordinate()[1]+0.1),\(pin.coordinate()[0]+0.1)"
             case .getImageForPhoto(let photo): return "https://farm\(photo.farm).staticflickr.com/\(photo.server)/\(photo.id)_\(photo.secret)_m.jpg"
             }
         }
@@ -65,11 +65,11 @@ class NetworkClient {
         }.resume()
     }
     
-    // This gets a photoResponse from the Flickr API based on a coordinate pair. This is either the point selected on the map or it comes from a pin object in the AlbumVC.
-    class func getPhotosRequest(coordinate: [Double], pageNo: Int, completion: @escaping (Result<PhotosResponse, Error>) -> Void) {
+    // This gets a photoResponse from the Flickr API from a pin object.
+    class func getPhotosRequest(pin: Pin, pageNo: Int, dataController: DataController, completion: @escaping (Result<PhotosResponse, Error>) -> Void) {
         
         // Use basic URL if no pageNo is provided
-        var url = Endpoints.getPhotos(coordinate).url
+        var url = Endpoints.getPhotos(pin).url
         
         // add page parameter if a random value has been given (from newCollectionTapped)
         if pageNo > 1 {
@@ -83,45 +83,27 @@ class NetworkClient {
                 completion(.failure(error))
             case .success(let response):
                 completion(.success(response))
-                print(response.stat)
+                // add total page count from response to pin entity
+                let viewContext = dataController.viewContext
+                pin.totalPages = Int32(response.photos.pages)
+                try? viewContext.save()
+                // create photo entity for each object in response.photos
+                for photo in response.photos.photo {
+                    let imageURL = Endpoints.getImageForPhoto(photo).url
+                    makePhoto(data: nil, imageURL: imageURL, pin: pin, dataController: dataController)
+                }
             }
         }
     }
     
-    // This function gets the photo data for each photo object in a photoResponse. It is called automatically every time a call to flickr is made.
-    class func getImageForPhotoRequest(response: PhotosResponse, completion: @escaping (Result<Data, Error>) -> Void) {
-        for photo in response.photos.photo {
-            URLSession.shared.dataTask(with: Endpoints.getImageForPhoto(photo).url) { data, response, error in
-                if let error = error {
-                    DispatchQueue.main.async {
-                        completion(.failure(error))
-                    }
-                    return
-                }
-                if let data = data {
-                    DispatchQueue.main.async {
-                        completion(.success(data))
-                    }
-                }
-            }.resume()
-        }
-    }
-    
-    class func makeImageURLForPhotoResponse(response: PhotosResponse, completion: @escaping (Result<Data, Error>) -> Void) {
-        for photo in response.photos.photo {
-            URLSession.shared.dataTask(with: Endpoints.getImageForPhoto(photo).url) { data, response, error in
-                if let error = error {
-                    DispatchQueue.main.async {
-                        completion(.failure(error))
-                    }
-                    return
-                }
-                if let data = data {
-                    DispatchQueue.main.async {
-                        completion(.success(data))
-                    }
-                }
-            }.resume()
-        }
+    // Creates a photo entity and saves it to the persistent store.
+    class func makePhoto(data: Data?, imageURL: URL, pin: Pin, dataController: DataController) {
+        let viewContext = dataController.viewContext
+        let photo = Photo(context: viewContext)
+        photo.creationDate = Date()
+        photo.imageURL = imageURL
+        photo.image = nil
+        photo.pin = pin
+        try? viewContext.save()
     }
 }
