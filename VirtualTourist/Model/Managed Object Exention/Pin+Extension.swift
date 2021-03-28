@@ -21,4 +21,8 @@ extension Pin {
         annotation.coordinate = CLLocationCoordinate2D(latitude: self.latitude, longitude: self.longitude)
         return annotation
     }
+    
+    public func coordinate() -> [Double] {
+        return [self.latitude, self.longitude]
+    }
 }

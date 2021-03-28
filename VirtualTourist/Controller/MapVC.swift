@@ -147,7 +147,7 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
             selectedCoordinate = pointOnMap
             mapView.setCenter(mapView.centerCoordinate, animated: false)
             let coordinateDouble = [pointOnMap.latitude, pointOnMap.longitude]
-            NetworkClient.getPhotosRequest(coordinate: coordinateDouble, completion: handleGetPhotosRequest(result:))
+            NetworkClient.getPhotosRequest(coordinate: coordinateDouble, page: 1, completion: self.handleGetPhotosRequest(result:))
         }
     }
     

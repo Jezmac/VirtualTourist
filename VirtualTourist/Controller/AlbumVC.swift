@@ -104,7 +104,38 @@ class AlbumVC: UIViewController {
                 }
                 try? viewContext.save()
             }
+            let randomPage = Int(arc4random_uniform(UInt32(pin.totalPages)) + 1)
+            print("page: \(randomPage)")
+            NetworkClient.getPhotosRequest(coordinate: pin.coordinate(), page: randomPage, completion: self.handleGetPhotosRequest(result:))
         }
+    }
+    
+    func handleGetPhotosRequest(result: Result<PhotosResponse, Error>) {
+        switch result {
+        case .failure:
+            Alert.showGetPhotosFailure(on: self)
+        case .success(let response):
+            NetworkClient.getImageForPhotoRequest(response: response, completion: self.handleImageForPhotoResponse(result:))
+            
+        }
+    }
+    
+    func handleImageForPhotoResponse(result: Result<Data, Error>) {
+        switch result {
+        case .failure(let error):
+            print(error.localizedDescription)
+        case .success(let data):
+            addPhotos(data)
+        }
+    }
+    
+    func addPhotos(_ data: (Data)) {
+        let viewContext = dataController.viewContext
+        let photo = Photo(context: viewContext)
+        photo.image = data
+        photo.creationDate = Date()
+        photo.pin = pin
+        try? viewContext.save()
     }
 }
     

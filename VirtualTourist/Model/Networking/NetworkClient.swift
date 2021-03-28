@@ -63,8 +63,13 @@ class NetworkClient {
     }
     
     
-    class func getPhotosRequest(coordinate: [Double], completion: @escaping (Result<PhotosResponse, Error>) -> Void) {
+    class func getPhotosRequest(coordinate: [Double], page: Int, completion: @escaping (Result<PhotosResponse, Error>) -> Void) {
+        var url = Endpoints.getPhotos(coordinate).url
+        if page > 1 {
+            url.append
+        }
         taskForGETRequest(url: Endpoints.getPhotos(coordinate).url, response: PhotosResponse.self) { result in
+            print(url)
             switch result {
             case .failure(let error):
                 completion(.failure(error))
