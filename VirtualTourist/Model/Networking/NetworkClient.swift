@@ -10,7 +10,6 @@ import UIKit
 
 class NetworkClient {
     
-    let AuthKey = "911bebfe2a9beb397796a7fb3f02febd"
     let secret = "b661c8eea9ef884f"
     
     // This is the url with geo context as limiting factor. adds latitude and longitude queries.
@@ -26,7 +25,7 @@ class NetworkClient {
         
         var stringValue: String {
             switch self {
-            case .getPhotos(let coordinate): return "\(Endpoints.base)?method=flickr.photos.search&api_key=\(Endpoints.key)&geo_context=2&lat=\(coordinate[0])&lat=\(coordinate[1])&radius=0.1&per_page=30&format=json&nojsoncallback=1&bbox=\(coordinate[1]-0.1),\(coordinate[0]-0.1),\(coordinate[1]+0.1),\(coordinate[0]+0.1)"
+            case .getPhotos(let coordinate): return "\(Endpoints.base)?method=flickr.photos.search&api_key=\(Endpoints.key)&geo_context=2&lat=\(coordinate[0])&lon=\(coordinate[1])&radius=0.1&per_page=30&format=json&nojsoncallback=1&bbox=\(coordinate[1]-0.1),\(coordinate[0]-0.1),\(coordinate[1]+0.1),\(coordinate[0]+0.1)"
             case .getImageForPhoto(let photo): return "https://farm\(photo.farm).staticflickr.com/\(photo.server)/\(photo.id)_\(photo.secret)_m.jpg"
             }
         }

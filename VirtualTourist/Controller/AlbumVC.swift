@@ -38,6 +38,7 @@ class AlbumVC: UIViewController {
         super.viewWillAppear(animated)
         setUpFetchedResultsController()
         imageCollection.reloadData()
+        print(pin.totalPages)
     }
     
     override func viewWillDisappear(_ animated: Bool) {

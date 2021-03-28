@@ -21,6 +21,8 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
     var fetchedResultsController: NSFetchedResultsController<Pin>!
     
     var newPin: Pin!
+    var selectedCoordinate: CLLocationCoordinate2D!
+
     
     var pinObserverToken: Any!
     
@@ -142,8 +144,10 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
             // convert point of touch to coordinate in mapview
             let pointInView = sender.location(in: mapView)
             let pointOnMap = mapView.convert(pointInView, toCoordinateFrom: mapView)
+            selectedCoordinate = pointOnMap
             mapView.setCenter(mapView.centerCoordinate, animated: false)
-            addPin(coordinate: pointOnMap)
+            let coordinateDouble = [pointOnMap.latitude, pointOnMap.longitude]
+            NetworkClient.getPhotosRequest(coordinate: coordinateDouble, completion: handleGetPhotosRequest(result:))
         }
     }
     
@@ -166,9 +170,10 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
         case .failure:
             Alert.showGetPhotosFailure(on: self)
         case .success(let response):
+            print(response.photos.pages)
+            addPin(coordinate: selectedCoordinate, totalPages: response.photos.pages)
             NetworkClient.getImageForPhotoRequest(response: response, completion: handleImageForPhotoResponse(result:))
             
-        // addpin() here pass in necessary stuff for photorequest
         }
     }
     
@@ -212,14 +217,13 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
     }
     
     // Saves pin to persistent store
-    func addPin(coordinate: CLLocationCoordinate2D) {
-        let coordinateDouble = [coordinate.latitude, coordinate.longitude]
-        NetworkClient.getPhotosRequest(coordinate: coordinateDouble, completion: self.handleGetPhotosRequest(result:))
+    func addPin(coordinate: CLLocationCoordinate2D, totalPages: Int) {
         let viewContext = dataController.viewContext
         viewContext.perform {
             let pin = Pin(context: viewContext)
             pin.latitude = coordinate.latitude
             pin.longitude = coordinate.longitude
+            pin.totalPages = Int32(totalPages)
             try? viewContext.save()
             self.newPin = pin
             self.mapView.addAnnotation(pin.annotation())
