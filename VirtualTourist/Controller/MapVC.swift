@@ -12,14 +12,13 @@ import CoreData
 class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDelegate {
     
     //MARK:- Global Variables
+    
     private let regionKey = "region"
     var annotations: [MKPointAnnotation]!
     var dataController: DataController!
     var fetchedResultsController: NSFetchedResultsController<Pin>!
     var newPin: Pin!
 
-    
-    var pinObserverToken: Any!
     
     //MARK:- Outlets
     
@@ -52,6 +51,9 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
 
     
     
+    //MARK:- LifeCycleFunctions
+    
+    // Region has an extension containing a load function to keep the view controller clean.
     private func loadStoredRegion() {
         if let region = mapView.region.load(from: UserDefaults.standard, with: regionKey) {
             mapView.region = region
@@ -74,7 +76,7 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
         }
     }
     
-    
+    // Clears all annotations and loads all those fecthed from the persistent store
     func loadAnnotations() {
         mapView.removeAnnotations(mapView.annotations)
         if let pins = fetchedResultsController.fetchedObjects {
@@ -86,7 +88,7 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
         }
     }
     
-    
+    // Segue to albumVC and pass the selected pin object plus dataController
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if (segue.identifier == "pinTapped") {
             let albumVC = segue.destination as! AlbumVC
@@ -112,7 +114,9 @@ class MapVC: UIViewController, MKMapViewDelegate, NSFetchedResultsControllerDele
         }
     }
     
-    fileprivate func testForMatchingPin(_ coordinate: CLLocationCoordinate2D) {
+    
+    // Checks all pins in fetchedObjects against the coordinate of the selected pin if they match then the segue in performed and the matching pin is the sender
+    private func testForMatchingPin(_ coordinate: CLLocationCoordinate2D) {
         if let pins = fetchedResultsController.fetchedObjects {
             for pin in pins {
                 if pin.latitude == coordinate.latitude && pin.longitude == coordinate.longitude {

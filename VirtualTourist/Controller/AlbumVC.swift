@@ -32,7 +32,6 @@ class AlbumVC: UIViewController, MKMapViewDelegate {
         imageCollection.contentMode = .scaleAspectFill
         setupCollectionViewDataSource()
     }
-    
 
     
     override func viewWillAppear(_ animated: Bool) {
@@ -47,6 +46,7 @@ class AlbumVC: UIViewController, MKMapViewDelegate {
     }
     
     
+    // The fetch results controller only fetches photos associated with the pin object passed by MapVC. They have to be sorted, though it is not relevant to the display.
     private func setUpFetchedResultsController() {
         let fetchRequest: NSFetchRequest<Photo> = Photo.fetchRequest()
         let predicate = NSPredicate(format: "pin == %@", pin)
@@ -63,7 +63,9 @@ class AlbumVC: UIViewController, MKMapViewDelegate {
         }
     }
     
-    fileprivate func setupNewCollectionButton() {
+    
+    // These if else statements control the appearance and text of the newCollection button dependant on if there are photos present and if there is only 1 page of results.
+    private func setupNewCollectionButton() {
         print(pin.totalPages)
         if pin.totalPages == 1 {
             newCollectionButton.isEnabled(false)
@@ -85,12 +87,13 @@ class AlbumVC: UIViewController, MKMapViewDelegate {
             
             let aPhoto = self.fetchedResultsController.object(at: indexPath)
             
-            
+            // If image data is not present a placeholder is activated with activity indicator
             if aPhoto.image == nil {
                 self.newCollectionButton.isEnabled(false)
                 cell.imageView.backgroundColor = ColorPalette.udacityBlue.withAlphaComponent(0.5)
                 cell.activityIndicator.startAnimating()
                 
+                // Downloads each photo from url then sets the cell's image property on the main queue
                 DispatchQueue.global(qos: .background).async {
                     if let imageData = try? Data(contentsOf: aPhoto.imageURL!) {
                         DispatchQueue.main.async {
@@ -103,6 +106,7 @@ class AlbumVC: UIViewController, MKMapViewDelegate {
                         }
                     }
                 }
+                // If the entities are already populated with data no download is needed
             } else {
                 if let imageData = aPhoto.image {
                     cell.imageView.backgroundColor = .white
@@ -117,7 +121,7 @@ class AlbumVC: UIViewController, MKMapViewDelegate {
         }
     }
     
-    
+    // creates annotation and orientates map based on the coordinates of the pin object
     func mapManager(mapView: MKMapView) {
         let annotation = pin.annotation()
         mapView.addAnnotation(annotation)
@@ -135,23 +139,23 @@ class AlbumVC: UIViewController, MKMapViewDelegate {
         if pinView == nil {
             pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
             pinView!.pinTintColor = .red
-            pinView!.animatesDrop = true
         } else {
             pinView!.annotation = annotation
         }
         return pinView
     }
     
-    
+    // Deletes Photo entity associated with indexpath sent from collectionview didselectat: method
     func deletePhoto(at indexPath: IndexPath) {
         let viewContext = dataController.viewContext
         viewContext.performAndWait {
             let photoToDelete = self.fetchedResultsController.object(at: indexPath)
-            print(photoToDelete)
             viewContext.delete(photoToDelete)
             try? viewContext.save()
         }
     }
+    
+    // if collection button is tapped the photo objects are deleted inn reverse order and a new set are downloaded from Flickr. This new set uses a page value which is a random number between 1 and either the total number of pages or 4000/number of photos per page as Flickr can only handle 4000 images.
     @IBAction func newCollectionTapped(_ sender: Any) {
         if let photos = fetchedResultsController.fetchedObjects {
             let viewContext = dataController.viewContext
@@ -165,16 +169,23 @@ class AlbumVC: UIViewController, MKMapViewDelegate {
             let randomPage = Int(arc4random_uniform(UInt32(page)) + 1)
             print("page: \(randomPage)")
             NetworkClient.getPhotosRequest(pin: pin, pageNo: randomPage, dataController: dataController) { result in
-                
+                switch result {
+                case .failure:
+                    Alert.showGetPhotosFailure(on: self)
+                case .success(let result):
+                    print(result.stat)
+                }
             }
         }
     }
 }
     
 
+//MARK:- Collection view appearance and behaviour methods.
+
 extension AlbumVC: UICollectionViewDelegate, NSFetchedResultsControllerDelegate, UICollectionViewDelegateFlowLayout {
     
-    
+    // Sets three per row with slight seperation between cells
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let widthRowOfThree = collectionView.bounds.width / 3.0 - 1
         let height = widthRowOfThree
@@ -193,14 +204,17 @@ extension AlbumVC: UICollectionViewDelegate, NSFetchedResultsControllerDelegate,
         return 1
     }
     
+    // Delegate method.
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return fetchedResultsController.sections?[section].numberOfObjects ?? 0
     }
     
+    // Calls deletPhoto on selection
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         deletePhoto(at: indexPath)
     }
     
+    // This is the method that sets up the diffable datasource animations on changes in the dataModel.
     func controller(_ controller: NSFetchedResultsController<NSFetchRequestResult>, didChangeContentWith snapshot: NSDiffableDataSourceSnapshotReference) {
         self.diffableDataSource.apply(snapshot as NSDiffableDataSourceSnapshot<String, NSManagedObjectID>, animatingDifferences: true)
     }
